@@ -1,0 +1,3 @@
+Dockerfile
+flaskr.db
+*.pyc
