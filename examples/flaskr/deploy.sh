@@ -1,11 +1,12 @@
 #!/bin/bash
 
 registry=$1
+bluemix_registry=$2
 
-docker tag -f $registry $registry:$CIRCLE_SHA1
-docker push $registry:$CIRCLE_SHA1
+docker tag -f $registry $bluemix_registry:$CIRCLE_SHA1
+docker push $bluemix_registry:$CIRCLE_SHA1
 
-old_id=`cf ic ps | grep $registry | awk '{print $1}'`
+old_id=`cf ic ps | grep $bluemix_registry | awk '{print $1}'`
 echo "Old Container ID: $old_id"
 
 public_ip=`cf ic inspect $old_id | jq -r '.[0].NetworkSettings.PublicIpAddress'`
@@ -15,7 +16,7 @@ echo "Unbind public IP from old container"
 cf ic ip unbind $public_ip $old_id
 
 echo "Run new container"
-new_id=`cf ic run -p 80 $registry:$CIRCLE_SHA1`
+new_id=`cf ic run -p 80 $bluemix_registry:$CIRCLE_SHA1`
 echo "New Container ID: $new_id"
 
 echo "Bind public IP to new container"
