@@ -1,0 +1,36 @@
+machine:
+  timezone:
+    Asia/Tokyo
+  services:
+    - docker
+  python:
+    version: 2.7.11
+  environment:
+    FLASK_APP: flaskr.py
+
+dependencies:
+  pre:
+    - curl -v -L -o cf-cli_amd64.deb 'https://cli.run.pivotal.io/stable?release=debian64&source=github'
+    - sudo dpkg -i cf-cli_amd64.deb
+    - cf install-plugin -f https://static-ice.ng.bluemix.net/ibm-containers-linux_x64
+    - docker build -t registry.ng.bluemix.net/kaneko/flaskr .:
+        pwd: examples/flaskr
+  override:
+    - pip install flask pytest
+
+test:
+  override:
+    - py.test:
+        pwd: examples/flaskr
+    - docker run -d -p 80:80 registry.ng.bluemix.net/kaneko/flaskr; sleep 5
+    - curl --retry 3 --retry-delay 5 -v http://localhost
+  post:
+    - cf api https://api.ng.bluemix.net
+    - cf login -u $BLUEMIX_USER -p $BLUEMIX_PASSWORD -o $BLUEMIX_ORG -s $BLUEMIX_SPACE
+    - cf ic login
+
+deployment:
+  production:
+    branch: bluemix-docker
+    commands:
+      - docker push registry.ng.bluemix.net/kaneko/flaskr
