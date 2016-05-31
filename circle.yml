@@ -12,6 +12,7 @@ machine:
 
 dependencies:
   pre:
+    - sudo apt-get install -y jq
     - curl -v -L -o cf-cli_amd64.deb 'https://cli.run.pivotal.io/stable?release=debian64&source=github'
     - sudo dpkg -i cf-cli_amd64.deb
     - cf install-plugin -f https://static-ice.ng.bluemix.net/ibm-containers-linux_x64
@@ -37,7 +38,9 @@ deployment:
     commands:
       - docker push registry.ng.bluemix.net/kaneko/flaskr
       - id=`cf ic ps | grep $REGISTRY | awk '{print $1}'`
+      - echo $id
       - ip=`cf ic inspect $id | jq -r '.[0].NetworkSettings.PublicIpAddress'`
+      - echo $ip
       - cf ic ip unbind $ip $id
       - cf ic run -p 80 $REGISTRY
       - cf ic rm -f $id
