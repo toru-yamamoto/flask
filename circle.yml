@@ -8,7 +8,8 @@ machine:
   environment:
     FLASK_APP: flaskr.py
     REGISTRY: registry.ng.bluemix.net/kaneko/flaskr
-    REGISTRY_STAGING: registry.ng.bluemix.net/kaneko/flaskr-staging
+    REGISTRY_PRODUCTION: $REGISTRY-production
+    REGISTRY_STAGING: $REGISTRY-staging
     ENDPOINT: https://api.ng.bluemix.net
 
 dependencies:
@@ -37,7 +38,7 @@ deployment:
   production:
     branch: bluemix-docker
     commands:
-      - examples/flaskr/deploy.sh $REGISTRY
+      - examples/flaskr/deploy.sh $REGISTRY_PRODUCTION
 
   staging:
     branch: bluemix-docker-staging
