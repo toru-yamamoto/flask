@@ -1,4 +1,4 @@
-FROM python:2.7.11
+FROM python:2.7.10
 
 MAINTAINER tktk8924 <myphone.tk@gmail.com>
 
