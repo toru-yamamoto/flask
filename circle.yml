@@ -8,6 +8,7 @@ machine:
   environment:
     FLASK_APP: flaskr.py
     REGISTRY: registry.ng.bluemix.net/kaneko/flaskr
+    REGISTRY_STAGING: registry.ng.bluemix.net/kaneko/flaskr-staging
     ENDPOINT: https://api.ng.bluemix.net
 
 dependencies:
@@ -26,7 +27,7 @@ test:
     - py.test:
         pwd: examples/flaskr
     - docker run -d -p 80:80 $REGISTRY; sleep 5
-    - curl --retry 3 --retry-delay 5 -v http://localhost
+    - curl --retry 10 --retry-delay 5 -v http://localhost
   post:
     - cf api $ENDPOINT
     - cf login -u $BLUEMIX_USER -p $BLUEMIX_PASSWORD -o $BLUEMIX_ORG -s $BLUEMIX_SPACE
@@ -36,4 +37,9 @@ deployment:
   production:
     branch: bluemix-docker
     commands:
-      - examples/flaskr/deploy.sh
+      - examples/flaskr/deploy.sh $REGISTRY
+
+  staging:
+    branch: bluemix-docker-staging
+    commands:
+      - examples/flaskr/deploy.sh $REGISTRY_STAGING
